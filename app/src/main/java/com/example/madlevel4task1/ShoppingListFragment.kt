@@ -55,8 +55,21 @@ class ShoppingListFragment : Fragment() {
         }
 
 
+        fabDeleteAll.setOnClickListener {
+            removeAllProducts()
+        }
+
+
         createItemTouchHelper().attachToRecyclerView(rvShoppingList)
 
+    }
+    private fun removeAllProducts() {
+        mainScope.launch {
+            withContext(Dispatchers.IO) {
+                productRepository.deleteAllProducts()
+            }
+            getShoppingListFromDatabase()
+        }
     }
 
 
@@ -89,10 +102,12 @@ class ShoppingListFragment : Fragment() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.add_product_dialog_title))
         val dialogLayout = layoutInflater.inflate(R.layout.add_product_dialog, null)
-        val productName = dialogLayout.findViewById<EditText>(R.id.tvName)
-        val amount = dialogLayout.findViewById<EditText>(R.id.tvQuantity)
+        val productName = dialogLayout.findViewById<EditText>(R.id.txt_product_name)
+        println(productName)
+        val amount = dialogLayout.findViewById<EditText>(R.id.txt_amount)
 
         builder.setView(dialogLayout)
+
         builder.setPositiveButton(R.string.dialog_ok_btn) { _: DialogInterface, _: Int ->
             addProduct(productName, amount)
         }
